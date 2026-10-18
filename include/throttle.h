@@ -71,7 +71,6 @@ private:
   static int speedFiltered;
   static float potnomFiltered;
   static float brkRamped;
-  static float AveragePos(float Pos);
 };
 
 #endif // THROTTLE_H

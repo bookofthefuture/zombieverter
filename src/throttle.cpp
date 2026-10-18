@@ -62,15 +62,6 @@ static float SpeedFiltered = 0.0;
 
 static float regenlim = 0;
 
-#define PedalPosArrLen 50
-static float PedalPos;
-static float LastPedalPos;
-static float PedalChange = 0;
-static float PedalPosTot = 0;
-static float PedalPosArr[PedalPosArrLen];
-static uint8_t PedalPosIdx = 0;
-static int8_t PedalReq = 0; // positive is accel negative is decell
-
 /**
  * @brief Check the throttle input for sanity and limit the range to min/max
  * values
@@ -183,30 +174,6 @@ float Throttle::CalcThrottle(int potval, int potIdx, bool brkpedal) {
     potnom = (potnom - throtdead) * (100.0f / (100.0f - throtdead));
   }
 
-  //!! pedal command intent coding
-
-  PedalPos = potnom; // save comparison next time to check if pedal had moved
-
-  float TempAvgPos =
-      AveragePos(PedalPos); // get an rolling average pedal position over the
-                            // last 50 measurements for smoothing
-
-  PedalChange =
-      PedalPos - TempAvgPos; // current pedal position compared to average
-
-  if (PedalChange < -1.0) // Check pedal is release compared to last time
-  {
-    PedalReq = -1; // pedal is released enough - Commanding regen or slowing
-  } else if (PedalChange >
-             1.0) // Check pedal is increased compared to last time
-  {
-    PedalReq =
-        1; // pedal pressed - Commanding accelerating - thus always more power
-  } else   // pedal not changed
-  {
-    potnom = TempAvgPos; // use the averaged pedal
-  }
-
   // Do clever bits for regen and such.
 
   if (speed < 100 ||
@@ -224,22 +191,16 @@ float Throttle::CalcThrottle(int potval, int potIdx, bool brkpedal) {
 
   if (dir == 1) // Forward
   {
-    // change limits to uint32, multiply by 10 then 0.1 to add a decimal to
-    // remove the hard edges
-    potnom = utils::changeFloat(potnom, 0, 100, regenlim * 10, throtmax * 10);
-    potnom *= 0.1;
+    potnom = utils::changeFloat(potnom, 0.0f, 100.0f, regenlim, throtmax);
   } else // Reverse, as neutral already exited function
   {
     if (Param::GetInt(Param::revRegen) == 0) // If regen in reverse is to be off
     {
-      regenlim = 0;
+      regenlim = 0.0f;
     }
-    potnom =
-        utils::changeFloat(potnom, 0, 100, regenlim * 10, throtmaxRev * 10);
-    potnom *= 0.1;
+    potnom = utils::changeFloat(potnom, 0.0f, 100.0f, regenlim, throtmaxRev);
   }
 
-  LastPedalPos = PedalPos; // Save current pedal position for next loop.
   return potnom;
 }
 
@@ -393,27 +354,15 @@ void Throttle::IdcLimitCommand(float &finalSpnt, float idc) {
 }
 
 void Throttle::SpeedLimitCommand(float &finalSpnt, int speed) {
-  static int speedFiltered = 0;
+  static float speedFiltered = 0.0f;
 
-  speedFiltered = IIRFILTER(speedFiltered, speed, 4);
+  speedFiltered = IIRFILTERF(speedFiltered, (float)speed, 4);
 
-  if (finalSpnt > 0) {
-    int speederr = speedLimit - speedFiltered;
-    int res = speederr / 4;
+  if (finalSpnt > 0.0f) {
+    float speederr = (float)speedLimit - speedFiltered;
+    float res = speederr * 0.25f;
 
-    res = MAX(0, res);
+    res = MAX(0.0f, res);
     finalSpnt = MIN(res, finalSpnt);
   }
-}
-
-float Throttle::AveragePos(float Pos) {
-  PedalPosIdx++; // next average arrray positon
-  if (PedalPosIdx >= PedalPosArrLen) {
-    PedalPosIdx = 0;
-  }
-  PedalPosTot -= PedalPosArr[PedalPosIdx];
-  PedalPosTot += Pos;
-  PedalPosArr[PedalPosIdx] = Pos;
-
-  return PedalPosTot / PedalPosArrLen;
 }

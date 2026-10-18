@@ -483,7 +483,8 @@ float ProcessThrottle(int speed) {
   if (speed < Param::GetInt(Param::throtramprpm)) {
     Throttle::throttleRamp = Param::GetFloat(Param::throtramp);
   } else {
-    Throttle::throttleRamp = Param::GetAttrib(Param::throtramp)->max;
+    Throttle::throttleRamp =
+        FP_TOFLOAT(Param::GetAttrib(Param::throtramp)->max);
   }
 
   finalSpnt = utils::GetUserThrottleCommand();
@@ -505,13 +506,14 @@ float ProcessThrottle(int speed) {
   Throttle::IdcLimitCommand(finalSpnt, ABS(Param::GetFloat(Param::idc)));
   Throttle::SpeedLimitCommand(finalSpnt, ABS(speed));
 
-  if (Throttle::TemperatureDerate(Param::Get(Param::tmphs),
-                                  Param::Get(Param::tmphsmax), finalSpnt)) {
+  if (Throttle::TemperatureDerate(Param::GetFloat(Param::tmphs),
+                                  Param::GetFloat(Param::tmphsmax),
+                                  finalSpnt)) {
     ErrorMessage::Post(ERR_TMPHSMAX);
   }
 
-  if (Throttle::TemperatureDerate(Param::Get(Param::tmpm),
-                                  Param::Get(Param::tmpmmax), finalSpnt)) {
+  if (Throttle::TemperatureDerate(Param::GetFloat(Param::tmpm),
+                                  Param::GetFloat(Param::tmpmmax), finalSpnt)) {
     ErrorMessage::Post(ERR_TMPMMAX);
   }
 
