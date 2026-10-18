@@ -60,7 +60,8 @@ void BMW_Z3::Msg316() // DME1 - engine speed
   }
 
   uint8_t bytes[8];
-  // Byte 0 - Status - 0x01 Terminal 15, 0x04 Traction Control OK, 0x08 gearbox type
+  // Byte 0 - Status - 0x01 Terminal 15, 0x04 Traction Control OK, 0x08 gearbox
+  // type
   bytes[0] = 0x0D;
   bytes[1] = 0x00;
   bytes[2] = canRPM & 0xFF; // RPM LSB
@@ -102,7 +103,7 @@ void BMW_Z3::Msg329() // DME2 - ASC/DSC status
   bytes[2] = 0xc5;
   bytes[3] = byte3;
   bytes[4] = 0x00;
-  bytes[5] = accelPot;                                // throttle position
+  bytes[5] = accelPot;                                 // throttle position
   bytes[6] = Param::GetBool(Param::din_brake) ? 1 : 0; // brake pedal
   bytes[7] = 0x00;
 
