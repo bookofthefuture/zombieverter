@@ -370,6 +370,23 @@ static void Ms200Task(void) {
   preheater.Task200Ms(opmode, hours, minutes);
 }
 
+// Broadcasts VCU operating state on a fixed frame so an external BMS (e.g.
+// BMWPhevBMS) can switch between Ready/Drive/Charge without relying on the
+// user-configurable CanMap, which can only target one bus and is already
+// used for the car CAN.
+// NOTE: spec called for CAN ID 0x3A0, but src/i3LIM.cpp already sends a
+// "vehicle condition" frame with that exact ID (towards the DC fast charge
+// port). Using 0x3A1 instead to avoid two different senders using the same
+// ID if BMSCan and ChargerCan are ever pointed at the same physical bus.
+static void SendBmsStateFrame() {
+  uint8_t bytes[8] = {0};
+  bytes[0] = Param::GetInt(Param::opmode);
+  bytes[1] = Param::GetInt(Param::chgtyp);
+
+  CanHardware *bms_can = canInterface[Param::GetInt(Param::BMSCan)];
+  bms_can->Send(0x3A1, bytes, 8);
+}
+
 static void Ms100Task(void) {
   DigIo::led_out.Toggle();
   iwdg_reset();
@@ -397,6 +414,7 @@ static void Ms100Task(void) {
   selectedShifter->Task100Ms();
   selectedHeater->Task100Ms();
   canMap->SendAll();
+  SendBmsStateFrame();
   canSdo->TriggerTimeout(100);
 
   if (OutlanderCAN == true) {
