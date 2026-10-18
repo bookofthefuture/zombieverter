@@ -33,7 +33,8 @@ class BMW_Z3 : public Vehicle {
 public:
   void Task10Ms();
   void SetRevCounter(int s) { speed = s; }
-  void SetTemperatureGauge(float) {} // motor temp is read from Param::tmpm directly in Msg329()
+  void SetTemperatureGauge(float) {
+  } // motor temp is read from Param::tmpm directly in Msg329()
   bool Ready();
 
 private:
@@ -42,7 +43,8 @@ private:
   void Msg545();
 
   uint16_t speed;
-  bool clusterStart = true; // sweeps rev counter to max on power-up, like the real DME
+  bool clusterStart =
+      true; // sweeps rev counter to max on power-up, like the real DME
 };
 
 #endif /* BMW_Z3_h */
