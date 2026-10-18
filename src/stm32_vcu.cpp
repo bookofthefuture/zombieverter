@@ -394,7 +394,6 @@ static void Ms100Task(void) {
   selectedDCDC->Task100Ms();
   selectedShifter->Task100Ms();
   selectedHeater->Task100Ms();
-  canMap->SendAll();
   canSdo->TriggerTimeout(100);
 
   if (OutlanderCAN == true) {
@@ -879,6 +878,7 @@ static void Ms1Task(void) {
   selectedChargeInt->Task1Ms();
   selectedShifter->Task1Ms();
   selectedDCDC->Task1Ms();
+  canMap->SendAll();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
