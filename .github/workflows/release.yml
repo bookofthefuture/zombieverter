@@ -1,0 +1,66 @@
+name: Release
+
+# Push a tag like v2.41A to publish a release, or v2.41A-rc1 for a pre-release.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: build-and-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build package dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-arm-none-eabi
+
+      - name: Build dependencies
+        run: |
+          make get-deps -j `nproc`
+
+      - name: Build Stm32-vcu firmware
+        run: |
+          make
+
+      - name: Build and run unit tests on host
+        run: |
+          make Test
+          test/test_vcu
+
+      - name: Check firmware version matches tag
+        run: |
+          FW_VER=$(sed -n 's/^#define VER \(.*\)$/\1/p' include/param_prj.h)
+          TAG_VER="${GITHUB_REF_NAME#v}"
+          if [ "${TAG_VER%%-*}" != "$FW_VER" ]; then
+            echo "::warning::Tag $GITHUB_REF_NAME does not match VER $FW_VER in include/param_prj.h"
+          fi
+
+      - name: Package release assets
+        run: |
+          mkdir dist
+          cp stm32_vcu.bin "dist/stm32_vcu_${GITHUB_REF_NAME}.bin"
+          cp stm32_vcu.hex "dist/stm32_vcu_${GITHUB_REF_NAME}.hex"
+          cp stm32_vcu "dist/stm32_vcu_${GITHUB_REF_NAME}.elf"
+          cd dist && sha256sum * > SHA256SUMS
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""
+          case "$GITHUB_REF_NAME" in *-*) PRERELEASE="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            $PRERELEASE
