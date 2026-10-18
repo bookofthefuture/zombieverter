@@ -23,8 +23,8 @@
 
 #include "BMW_E31.h"
 #include "BMW_E39.h"
-#include "BMW_Z3.h"
 #include "BMW_E65.h"
+#include "BMW_Z3.h"
 #include "CANSPI.h"
 #include "CPC.h"
 #include "Can_OBD2.h"
@@ -1392,9 +1392,8 @@ int main(void) {
   DigIo::inv_out.Clear(); // inverter power off during bootup
   DigIo::mcp_sby.Clear(); // enable can3
 
-  DigIo::CANEN.Set();//enable can1 on V1.3 HW
+  DigIo::CANEN.Set(); // enable can1 on V1.3 HW
   DigIo::CANSBY.Set();
-
 
   Terminal t(USART3, TermCmds, false, true, !Param::GetBool(Param::UseRS232));
   //   FunctionPointerCallback canCb(CanCallback, SetCanFilters);
