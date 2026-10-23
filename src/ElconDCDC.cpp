@@ -49,7 +49,7 @@ void ElconDCDC::Task100Ms() {
   int opmode = Param::GetInt(Param::opmode);
   uint8_t bytes[8];
 
-  if (opmode == MOD_RUN || opmode == MOD_CHARGE) {
+  if (opmode == MOD_RUN || opmode == MOD_CHARGE || opmode == MOD_MAINTAIN) {
     timer200++;
     if (timer200 == 2) {
 

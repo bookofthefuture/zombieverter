@@ -51,7 +51,7 @@ void TeslaDCDC::Task100Ms() {
   //  Declare data frame array.
   uint8_t bytes[8];
 
-  if (opmode == MOD_RUN || opmode == MOD_CHARGE) {
+  if (opmode == MOD_RUN || opmode == MOD_CHARGE || opmode == MOD_MAINTAIN) {
     timer500++;
     if (timer500 == 5) {
       //   Payload=(byteswap((DCSetVal-9)*146)+0x4)<<8;//prob going to not work
