@@ -25,24 +25,16 @@
 
 #define WAKEUP_BLOCK_MINS 90
 
-Maintainer12V::Maintainer12V() :
-  minsUntilAllowedAgain(WAKEUP_BLOCK_MINS),
-  minsUntilAllowedAgainTicks(0),
-  runMaintainer(false),
-  maintainTicks(0),
-  maintainTicks_1Min(0),
-  maintainDur_tmp(0),
-  initbyMaintain(false)
-{
-}
+Maintainer12V::Maintainer12V()
+    : minsUntilAllowedAgain(WAKEUP_BLOCK_MINS), minsUntilAllowedAgainTicks(0),
+      runMaintainer(false), maintainTicks(0), maintainTicks_1Min(0),
+      maintainDur_tmp(0), initbyMaintain(false) {}
 
 void Maintainer12V::SetInitByMaintainer(bool initbyM) {
   initbyMaintain = initbyM;
 }
 
-bool Maintainer12V::GetInitByMaintainer() {
-  return initbyMaintain;
-}
+bool Maintainer12V::GetInitByMaintainer() { return initbyMaintain; }
 
 bool Maintainer12V::GetRunMaintainer() { return runMaintainer; }
 
@@ -76,7 +68,8 @@ void Maintainer12V::Task200Ms(int opmode) {
     if (allowWakeup && actual12V < min12V && minsUntilAllowedAgain < 1 &&
         (maintainDur_tmp != 0)) {
       minsUntilAllowedAgain = WAKEUP_BLOCK_MINS;
-      maintainTicks = (Param::GetInt(Param::wakeupMin) * 300); // initialize timer
+      maintainTicks =
+          (Param::GetInt(Param::wakeupMin) * 300); // initialize timer
       maintainTicks_1Min = 0;
       runMaintainer = true; // if we arrive at set preheat time and duration is
                             // non zero then initiate preheat
@@ -91,8 +84,8 @@ void Maintainer12V::Task200Ms(int opmode) {
 
     if (maintainTicks == 0) {
       runMaintainer = false; // end preheat once timer expires.
-      maintainTicks = (Param::GetInt(Param::wakeupMin) * 300); // recharge the tick
-                                                        // timer
+      maintainTicks = (Param::GetInt(Param::wakeupMin) * 300); // recharge the
+                                                               // tick timer
     }
 
     if (maintainTicks_1Min == 300) {
@@ -110,8 +103,8 @@ void Maintainer12V::CancelMaintainer() {
 }
 
 void Maintainer12V::ParamsChange() {
-  maintainTicks =
-      (Param::GetInt(Param::wakeupMin) * 300); // number of 200ms ticks that equates to
-                                        // maintaince timer in minutes
+  maintainTicks = (Param::GetInt(Param::wakeupMin) *
+                   300); // number of 200ms ticks that equates to
+                         // maintaince timer in minutes
   maintainDur_tmp = Param::GetInt(Param::wakeupMin);
 }
