@@ -104,6 +104,12 @@ void VWBOX::ControlContactors(int opmode, CanHardware *can) {
     bytes[1] = bytes[1] | 0x50; // main on and prech on
     break;
 
+  case 6: // 12V maintain
+    bytes[2] = bytes[2] | 0x1;
+    ;                           // Neg on
+    bytes[1] = bytes[1] | 0x50; // main on and prech on
+    break;
+
   case 3:            // Precharge fail
     bytes[2] = 0x28; // all contactors off
     bytes[1] = bytes[1] | 0x00;
