@@ -1,5 +1,9 @@
 # stm32-vcu (ZombieVerter VCU)
 
+Fork of work by Damienn Maguire tweaked for my vehicles - BMW Z3 base with Lexus L210 motors and inverters.
+
+##
+
 [![Build status](../../actions/workflows/CI-build.yml/badge.svg)](../../actions/workflows/CI-build.yml)
 
 Project based on the OpenInverter System by Johannes Huebner to provide a universal VCU (Vehicle Control Unit) for electric vehicle conversion projects. 
