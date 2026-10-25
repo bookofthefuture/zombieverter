@@ -173,6 +173,10 @@ void SBOX::ControlContactors(int opmode, CanHardware *can) {
     CCByte = 0xAA; // All contactors activated
     break;
 
+  case 6:          // 12V maintain
+    CCByte = 0xAA; // All contactors activated
+    break;
+
   case 3:          // Precharge fail
     CCByte = 0x00; // all contactors off
     break;
